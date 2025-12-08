@@ -1,72 +1,109 @@
-import { useEffect, useState, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
-import { Styles } from '../src/Styles';
-import { PlaybackContext } from '../services/playbackContext';
-import Storage from '../services/storage';
+import { useState, useContext, useCallback } from "react";
+import { View, Text, TextInput, TouchableOpacity, FlatList } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { Styles } from "../src/Styles";
+import { PlaybackContext } from "../services/playbackContext";
+import PlaylistModal from "../components/PlaylistModal";
+import Storage from "../services/storage";
 
 const MOCK_TRACKS = [
-  { id: 't1', title: 'SoundHelix Song 1', artist: 'SoundHelix', uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-  { id: 't2', title: 'SoundHelix Song 2', artist: 'SoundHelix', uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-  { id: 't3', title: 'SoundHelix Song 3', artist: 'SoundHelix', uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-  { id: 't4', title: 'Sample Track 4', artist: 'Demo', uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
-  { id: 't5', title: 'Sample Track 5', artist: 'Demo', uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' }
+  { id: "t1", title: "SoundHelix Song 1", artist: "SoundHelix", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+  { id: "t2", title: "SoundHelix Song 2", artist: "SoundHelix", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+  { id: "t3", title: "SoundHelix Song 3", artist: "SoundHelix", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
+  { id: "t4", title: "Sample Track 4", artist: "Demo", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+  { id: "t5", title: "Sample Track 5", artist: "Demo", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" }
 ];
 
 export default function LibraryScreen({ navigation }) {
   const { playTrack } = useContext(PlaybackContext);
-  const [tracks, setTracks] = useState([]);
+  const [tracks] = useState(MOCK_TRACKS);
   const [playlists, setPlaylists] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
 
-  useEffect(() => {
-    setTracks(MOCK_TRACKS);
-    (async () => {
+  const loadPlaylists = useCallback(async () => {
+    try {
       const p = await Storage.getPlaylists();
       setPlaylists(p || []);
-    })();
+    } catch (err) {
+      console.log("Error loading playlists:", err);
+    }
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      loadPlaylists();
+    }, [loadPlaylists])
+  );
+
   function handlePlay(item) {
-    playTrack(item);
-    navigation.navigate('Player');
+    try {
+      playTrack(item);
+      navigation.navigate("Player", { track: item });
+    } catch (err) {
+      console.log("Error playing track:", err);
+    }
   }
 
-  async function handleAddToPlaylist(track) {
-    let p = await Storage.getPlaylists();
-    if (!p || p.length === 0) {
-      const newList = { name: 'Favorites', tracks: [track] };
-      await Storage.savePlaylist(newList);
-      p = await Storage.getPlaylists();
-      setPlaylists(p);
-      alert('Created playlist Favorites and added track');
-      return;
+  async function addToPlaylist(playlistId, track) {
+    try {
+      const p = await Storage.getPlaylists();
+      if (!p) return;
+
+      const updated = p.map(pl => {
+        if (pl.id === playlistId) {
+          return { ...pl, tracks: [...(pl.tracks || []), track] };
+        }
+        return pl;
+      });
+
+      await Storage.replacePlaylists(updated);
+      setPlaylists(updated);
+    } catch (err) {
+      console.log("Error adding to playlist:", err);
     }
-    p[0].tracks = p[0].tracks || [];
-    p[0].tracks.push(track);
-    await Storage.replacePlaylists(p);
-    setPlaylists(p);
-    alert('Added to playlist: ' + p[0].name);
   }
 
   return (
-    
-        <View style={Styles.body}>
-          <View style={Styles.header}><Text style={Styles.headerText}>Library</Text></View>
-          <View style={Styles.container}>
-            <TextInput placeholder="Search your music…" style={Styles.input} />
-            <FlatList
-              data={tracks}
-              keyExtractor={item => item.id}
-              renderItem={({item})=>(
-                <TouchableOpacity style={Styles.listItem} onPress={()=>handlePlay(item)}>
-                  <Text style={{fontWeight:'700'}}>{item.title}</Text>
-                  <Text style={Styles.smallText}>{item.artist}</Text>
-                  <TouchableOpacity onPress={()=>handleAddToPlaylist(item)}>
-                    <Text style={{color:'#2EA865', marginTop:8}}>Add to playlist</Text>
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </View>
+    <View style={Styles.body}>
+      <View style={Styles.header}>
+        <Text style={Styles.headerText}>Library</Text>
+      </View>
+
+      <View style={Styles.container}>
+        <TextInput placeholder="Search your music…" style={Styles.input} />
+
+        <FlatList
+          data={tracks}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 140 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={Styles.listItem} onPress={() => handlePlay(item)}>
+              <Text style={{ fontWeight: "700" }}>{item.title}</Text>
+              <Text style={Styles.smallText}>{item.artist}</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setCurrentTrack(item);
+                  setModalVisible(true);
+                }}
+              >
+                <Text style={Styles.trackAction}>Add to playlist</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          )}
+        />
+
+        <PlaylistModal
+          visible={modalVisible}
+          playlists={playlists}
+          onSelect={(playlistId) => {
+            addToPlaylist(playlistId, currentTrack);
+            setModalVisible(false);
+          }}
+          onClose={() => setModalVisible(false)}
+        />
+      </View>
+    </View>
   );
 }

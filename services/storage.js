@@ -1,45 +1,55 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const PLAYLISTS_KEY = '@rhythmflow_playlists_v1';
+import { v4 as uuidv4 } from 'uuid';
+
+const PLAYLISTS_KEY = '@rhythmflow_playlists_v2';
 
 export default {
-  async getPlaylists(){
-    try{
+  async getPlaylists() {
+    try {
       const raw = await AsyncStorage.getItem(PLAYLISTS_KEY);
       return raw ? JSON.parse(raw) : [];
-    }catch(e){
-      console.error('getPlaylists error', e);
+    } catch (e) {
+      console.log("getPlaylists error:", e);
       return [];
     }
   },
 
-  async savePlaylist(playlist){
-    try{
+  async savePlaylist(playlist) {
+    try {
       const list = await this.getPlaylists();
+      playlist.id = uuidv4();
       list.push(playlist);
       await AsyncStorage.setItem(PLAYLISTS_KEY, JSON.stringify(list));
-    }catch(e){
-      console.error('savePlaylist error', e);
+    } catch (e) {
+      console.log("savePlaylist error:", e);
     }
   },
 
-  async replacePlaylists(newList){
-    try{
+  async replacePlaylists(newList) {
+    try {
       await AsyncStorage.setItem(PLAYLISTS_KEY, JSON.stringify(newList));
-    }catch(e){
-      console.error('replacePlaylists error', e);
+    } catch (e) {
+      console.log("replacePlaylists error:", e);
     }
   },
 
-  async replacePlaylist(name, newPlaylist){
-    try{
+  async updatePlaylist(playlistId, updatedPlaylist) {
+    try {
       const list = await this.getPlaylists();
-      const idx = list.findIndex(l=>l.name===name);
-      if(idx>-1){
-        list[idx]=newPlaylist;
-        await AsyncStorage.setItem(PLAYLISTS_KEY, JSON.stringify(list));
-      }
-    }catch(e){
-      console.error('replacePlaylist error', e);
+      const updated = list.map(pl => pl.id === playlistId ? updatedPlaylist : pl);
+      await AsyncStorage.setItem(PLAYLISTS_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.log("updatePlaylist error:", e);
+    }
+  },
+
+  async clearAllPlaylists() {
+    try {
+      await AsyncStorage.removeItem(PLAYLISTS_KEY);
+      return true;
+    } catch (e) {
+      console.log("clearAllPlaylists error:", e);
+      return false;
     }
   }
 };
