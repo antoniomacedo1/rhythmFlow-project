@@ -1,5 +1,14 @@
 import React, { useState, useContext } from "react";
-import { View, Text, TouchableOpacity, FlatList, TextInput, Alert, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+  Alert,
+  ScrollView,
+  Image
+} from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Styles } from "../src/Styles";
 import Storage from "../services/storage";
@@ -56,10 +65,12 @@ export default function PlaylistsScreen({ navigation }) {
 
   return (
     <View style={Styles.body}>
+      {/* HEADER */}
       <View style={Styles.header}>
         <Text style={Styles.headerText}>Playlists</Text>
       </View>
 
+      {/* RESET BUTTON */}
       <TouchableOpacity
         onPress={handleReset}
         style={{
@@ -74,6 +85,7 @@ export default function PlaylistsScreen({ navigation }) {
       </TouchableOpacity>
 
       <ScrollView style={Styles.container}>
+        {/* CREATE PLAYLIST */}
         <TextInput
           placeholder="New playlist name…"
           style={Styles.input}
@@ -85,6 +97,7 @@ export default function PlaylistsScreen({ navigation }) {
           <Text style={Styles.buttonText}>Create Playlist</Text>
         </TouchableOpacity>
 
+        {/* PLAYLIST LIST */}
         <FlatList
           data={playlists}
           keyExtractor={(item, index) => String(index)}
@@ -103,11 +116,32 @@ export default function PlaylistsScreen({ navigation }) {
                       <TouchableOpacity
                         key={t.id + i}
                         onPress={() => handlePlay(t)}
-                        style={{ paddingVertical: 6 }}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          paddingVertical: 8,
+                        }}
                       >
-                        <Text>
-                          {t.title} — <Text style={Styles.smallText}>{t.artist}</Text>
-                        </Text>
+                        {/* Artwork Image */}
+                        <Image
+                          source={{
+                            uri:
+                              t.artwork ||
+                              "https://via.placeholder.com/100?text=No+Art",
+                          }}
+                          style={{
+                            width: 50,
+                            height: 50,
+                            borderRadius: 8,
+                            marginRight: 12,
+                          }}
+                        />
+
+                        {/* Track Title + Artist */}
+                        <View>
+                          <Text style={{ fontWeight: "600" }}>{t.title}</Text>
+                          <Text style={Styles.smallText}>{t.artist}</Text>
+                        </View>
                       </TouchableOpacity>
                     ))}
                   </>
