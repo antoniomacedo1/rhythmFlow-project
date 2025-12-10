@@ -4,12 +4,11 @@ import { PlaybackContext } from "../services/playbackContext";
 import { Styles } from "../src/Styles";
 
 export default function PlayerScreen({ navigation }) {
-  const { currentTrack, isPlaying, togglePlayPause, next, previous } =
-    useContext(PlaybackContext);
+  const { currentTrack, isPlaying, togglePlayPause, next, previous } = useContext(PlaybackContext);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F8F6" }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+      <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
         <View style={Styles.body}>
           
           {/* Header */}
@@ -20,9 +19,9 @@ export default function PlayerScreen({ navigation }) {
           {/* Back Button */}
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{ padding: 20 }}
+            style={{ marginTop: 10, marginBottom: 20 }}
           >
-            <Text style={{ fontSize: 16 }}>← Back to Library</Text>
+            <Text style={{ fontSize: 16 }}>Back</Text>
           </TouchableOpacity>
 
           <View style={Styles.container}>
@@ -30,11 +29,7 @@ export default function PlayerScreen({ navigation }) {
               <>
                 {/* ARTWORK IMAGE */}
                 <Image
-                  source={{
-                    uri:
-                      currentTrack.artwork ||
-                      "https://via.placeholder.com/600x400?text=No+Artwork",
-                  }}
+                  source={{ uri: currentTrack.artwork || "https://via.placeholder.com/640x360.png?text=Track" }}
                   style={Styles.trackImage}
                 />
 
@@ -44,16 +39,13 @@ export default function PlayerScreen({ navigation }) {
                   <Text style={Styles.cardSub}>{currentTrack.artist}</Text>
                 </View>
 
-                {/* CONTROLS */}
-                <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 25 }}>
+                <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 20 }}>
                   <TouchableOpacity onPress={previous} style={Styles.iconButton}>
-                    <Text style={{ color: "#fff", fontSize: 22 }}>⏮</Text>
+                    <Text style={{ color: "#fff" }}>⏮</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={togglePlayPause} style={Styles.iconButton}>
-                    <Text style={{ color: "#fff", fontSize: 22 }}>
-                      {isPlaying ? "⏸" : "▶"}
-                    </Text>
+                    <Text style={{ color: "#fff" }}>{isPlaying ? "⏸" : "▶"}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={next} style={Styles.iconButton}>

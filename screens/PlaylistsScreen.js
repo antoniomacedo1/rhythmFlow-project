@@ -1,14 +1,5 @@
 import React, { useState, useContext } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  TextInput,
-  Alert,
-  ScrollView,
-  Image
-} from "react-native";
+import { View, Text, TouchableOpacity, FlatList, TextInput, Alert, ScrollView, Image } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Styles } from "../src/Styles";
 import Storage from "../services/storage";
@@ -124,11 +115,7 @@ export default function PlaylistsScreen({ navigation }) {
                       >
                         {/* Artwork Image */}
                         <Image
-                          source={{
-                            uri:
-                              t.artwork ||
-                              "https://via.placeholder.com/100?text=No+Art",
-                          }}
+                          source={ {uri: t.artwork || "https://via.placeholder.com/100?text=No+Art" }}
                           style={{
                             width: 50,
                             height: 50,

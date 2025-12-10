@@ -68,10 +68,10 @@ export default function LibraryScreen({ navigation }) {
 
   function handlePlay(track) {
     try {
-      playTrack(tracks, track);  
+      playTrack(track);
       navigation.navigate("Player", { track });
     } catch (err) {
-      console.log("Error playing:", err);
+      console.log("Error in handlePlay:", err);
     }
   }
 
@@ -101,8 +101,6 @@ export default function LibraryScreen({ navigation }) {
       </View>
 
       <View style={Styles.container}>
-        <TextInput placeholder="Search your music…" style={Styles.input} />
-
         <FlatList
           data={tracks}
           keyExtractor={(item) => item.id}
