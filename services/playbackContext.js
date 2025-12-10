@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { Audio } from 'expo-av';
+import React, { createContext, useState, useEffect } from "react";
+import { Audio } from "expo-av";
 
 export const PlaybackContext = createContext();
 
@@ -10,60 +10,79 @@ export function PlaybackProvider({ children }) {
   const [queue, setQueue] = useState([]);
   const [index, setIndex] = useState(0);
 
-  useEffect(()=>{
-    return ()=>{ if(soundObj) soundObj.unloadAsync(); };
+  useEffect(() => {
+    return () => {
+      if (soundObj) soundObj.unloadAsync();
+    };
   }, [soundObj]);
 
-  async function playTrack(track){
-    try{
-      if(soundObj){
+  async function playTrack(track) {
+    try {
+      if (soundObj) {
         await soundObj.unloadAsync();
       }
+
       const { sound } = await Audio.Sound.createAsync(
         { uri: track.uri },
         { shouldPlay: true }
       );
+
       setSoundObj(sound);
       setCurrentTrack(track);
       setIsPlaying(true);
-    }catch(e){
-      console.error('play error', e);
+
+      setQueue((q) => [...q, track]);
+      setIndex(queue.length);
+    } catch (err) {
+      console.log("Play error:", err);
     }
   }
 
-  async function togglePlayPause(){
-    if(!soundObj) return;
+  async function togglePlayPause() {
+    if (!soundObj) return;
+
     const status = await soundObj.getStatusAsync();
-    if(status.isPlaying){
+
+    if (status.isPlaying) {
       await soundObj.pauseAsync();
       setIsPlaying(false);
-    }else{
+    } else {
       await soundObj.playAsync();
       setIsPlaying(true);
     }
   }
 
-  async function next(){
-    if(queue.length===0) return;
+  async function next() {
+    if (queue.length === 0) return;
+
     const nextIndex = (index + 1) % queue.length;
+    const track = queue[nextIndex];
+
     setIndex(nextIndex);
-    const t = queue[nextIndex];
-    if(t) await playTrack(t);
+    playTrack(track);
   }
 
-  async function previous(){
-    if(queue.length===0) return;
+  async function previous() {
+    if (queue.length === 0) return;
+
     const prevIndex = (index - 1 + queue.length) % queue.length;
+    const track = queue[prevIndex];
+
     setIndex(prevIndex);
-    const t = queue[prevIndex];
-    if(t) await playTrack(t);
+    playTrack(track);
   }
 
   return (
-    <PlaybackContext.Provider value={{
-      playTrack, togglePlayPause, next, previous,
-      currentTrack, isPlaying, queue, setQueue, addToQueue: (t)=>setQueue(q=>[...q,t])
-    }}>
+    <PlaybackContext.Provider
+      value={{
+        playTrack,
+        togglePlayPause,
+        next,
+        previous,
+        currentTrack,
+        isPlaying
+      }}
+    >
       {children}
     </PlaybackContext.Provider>
   );

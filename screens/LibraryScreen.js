@@ -36,12 +36,12 @@ export default function LibraryScreen({ navigation }) {
     }, [loadPlaylists])
   );
 
-  function handlePlay(item) {
+  function handlePlay(track) {
     try {
-      playTrack(item);
-      navigation.navigate("Player", { track: item });
+      playTrack(tracks, track);  
+      navigation.navigate("Player", { track });
     } catch (err) {
-      console.log("Error playing track:", err);
+      console.log("Error playing:", err);
     }
   }
 
