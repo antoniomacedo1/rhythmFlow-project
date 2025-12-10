@@ -7,11 +7,41 @@ import PlaylistModal from "../components/PlaylistModal";
 import Storage from "../services/storage";
 
 const MOCK_TRACKS = [
-  { id: "t1", title: "SoundHelix Song 1", artist: "SoundHelix", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-  { id: "t2", title: "SoundHelix Song 2", artist: "SoundHelix", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
-  { id: "t3", title: "SoundHelix Song 3", artist: "SoundHelix", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-  { id: "t4", title: "Sample Track 4", artist: "Demo", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-  { id: "t5", title: "Sample Track 5", artist: "Demo", uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" }
+  { 
+    id: "t1",
+    title: "SoundHelix Song 1",
+    artist: "SoundHelix",
+    uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    artwork: "https://img.youtube.com/vi/7V3jqsIe8c0/maxresdefault.jpg"
+  },
+  { 
+    id: "t2",
+    title: "SoundHelix Song 2",
+    artist: "SoundHelix",
+    uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    artwork: "https://img.youtube.com/vi/7V3jqsIe8c0/maxresdefault.jpg"
+  },
+  { 
+    id: "t3",
+    title: "SoundHelix Song 3",
+    artist: "SoundHelix",
+    uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    artwork: "https://img.youtube.com/vi/7V3jqsIe8c0/maxresdefault.jpg"
+  },
+  { 
+    id: "t4",
+    title: "Sample Track 4",
+    artist: "Demo",
+    uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+    artwork: "https://img.youtube.com/vi/7V3jqsIe8c0/maxresdefault.jpg"
+  },
+  { 
+    id: "t5",
+    title: "Sample Track 5",
+    artist: "Demo",
+    uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+    artwork: "https://img.youtube.com/vi/7V3jqsIe8c0/maxresdefault.jpg"
+  }
 ];
 
 export default function LibraryScreen({ navigation }) {
